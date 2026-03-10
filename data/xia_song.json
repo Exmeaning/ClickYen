@@ -1,0 +1,456 @@
+[
+  {
+    "type": "swipe",
+    "x1": 2056,
+    "y1": 1140,
+    "x2": 2028,
+    "y2": 1008,
+    "start_time_ms": 0,
+    "end_time_ms": 94,
+    "duration": 94,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2008,
+    "y": 1096,
+    "start_time_ms": 1784,
+    "end_time_ms": 1888,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1316,
+    "y": 1128,
+    "start_time_ms": 3596,
+    "end_time_ms": 3721,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1320,
+    "y": 1128,
+    "start_time_ms": 5431,
+    "end_time_ms": 5588,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1908,
+    "y": 1140,
+    "start_time_ms": 7272,
+    "end_time_ms": 7385,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1376,
+    "y": 1136,
+    "start_time_ms": 9083,
+    "end_time_ms": 9198,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2116,
+    "y": 1096,
+    "start_time_ms": 10875,
+    "end_time_ms": 10968,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1148,
+    "y": 1124,
+    "start_time_ms": 12776,
+    "end_time_ms": 12870,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1872,
+    "y": 1112,
+    "start_time_ms": 14555,
+    "end_time_ms": 14648,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1356,
+    "y": 1128,
+    "start_time_ms": 16354,
+    "end_time_ms": 16459,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2212,
+    "y": 1080,
+    "start_time_ms": 18148,
+    "end_time_ms": 18232,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1104,
+    "y": 1164,
+    "start_time_ms": 19983,
+    "end_time_ms": 20118,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2216,
+    "y": 1112,
+    "start_time_ms": 21833,
+    "end_time_ms": 21938,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1364,
+    "y": 1168,
+    "start_time_ms": 23626,
+    "end_time_ms": 23751,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1912,
+    "y": 1120,
+    "start_time_ms": 25394,
+    "end_time_ms": 25509,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1212,
+    "y": 1108,
+    "start_time_ms": 27300,
+    "end_time_ms": 27383,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2180,
+    "y": 1144,
+    "start_time_ms": 29057,
+    "end_time_ms": 29173,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1428,
+    "y": 1136,
+    "start_time_ms": 30932,
+    "end_time_ms": 31025,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "long_click",
+    "x": 1888,
+    "y": 1108,
+    "start_time_ms": 32701,
+    "end_time_ms": 34482,
+    "duration": 1781,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1104,
+    "y": 1144,
+    "start_time_ms": 36386,
+    "end_time_ms": 36501,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1932,
+    "y": 1136,
+    "start_time_ms": 38174,
+    "end_time_ms": 38247,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1400,
+    "y": 1124,
+    "start_time_ms": 40013,
+    "end_time_ms": 40128,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 2164,
+    "y": 1132,
+    "start_time_ms": 41773,
+    "end_time_ms": 41878,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1180,
+    "y": 1156,
+    "start_time_ms": 43640,
+    "end_time_ms": 43733,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1892,
+    "y": 1104,
+    "start_time_ms": 45405,
+    "end_time_ms": 45499,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "long_click",
+    "x": 1336,
+    "y": 1120,
+    "start_time_ms": 47287,
+    "end_time_ms": 49061,
+    "duration": 1774,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1976,
+    "y": 1152,
+    "start_time_ms": 50884,
+    "end_time_ms": 51009,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1920,
+    "y": 1116,
+    "start_time_ms": 51840,
+    "end_time_ms": 51935,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1424,
+    "y": 1128,
+    "start_time_ms": 52748,
+    "end_time_ms": 52852,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1912,
+    "y": 1148,
+    "start_time_ms": 53644,
+    "end_time_ms": 53758,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1380,
+    "y": 1164,
+    "start_time_ms": 54605,
+    "end_time_ms": 54710,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1416,
+    "y": 1148,
+    "start_time_ms": 55442,
+    "end_time_ms": 55556,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1972,
+    "y": 1128,
+    "start_time_ms": 56324,
+    "end_time_ms": 56428,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1412,
+    "y": 1160,
+    "start_time_ms": 57280,
+    "end_time_ms": 57385,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1796,
+    "y": 1112,
+    "start_time_ms": 58146,
+    "end_time_ms": 58250,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1844,
+    "y": 1112,
+    "start_time_ms": 59073,
+    "end_time_ms": 59156,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1340,
+    "y": 1116,
+    "start_time_ms": 60019,
+    "end_time_ms": 60112,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1804,
+    "y": 1088,
+    "start_time_ms": 60917,
+    "end_time_ms": 61000,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "swipe",
+    "x1": 1460,
+    "y1": 1104,
+    "x2": 1456,
+    "y2": 1040,
+    "start_time_ms": 61813,
+    "end_time_ms": 61928,
+    "duration": 115,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1412,
+    "y": 1136,
+    "start_time_ms": 62699,
+    "end_time_ms": 62803,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "long_click",
+    "x": 1868,
+    "y": 1132,
+    "start_time_ms": 63619,
+    "end_time_ms": 65426,
+    "duration": 1807,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1412,
+    "y": 1144,
+    "start_time_ms": 66351,
+    "end_time_ms": 66476,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1864,
+    "y": 1140,
+    "start_time_ms": 67273,
+    "end_time_ms": 67398,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1448,
+    "y": 1164,
+    "start_time_ms": 68201,
+    "end_time_ms": 68315,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1788,
+    "y": 1136,
+    "start_time_ms": 69128,
+    "end_time_ms": 69211,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1456,
+    "y": 1128,
+    "start_time_ms": 69990,
+    "end_time_ms": 70094,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1928,
+    "y": 1124,
+    "start_time_ms": 70896,
+    "end_time_ms": 70970,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+    {
+    "type": "click",
+    "x": 1056,
+    "y": 1120,
+    "start_time_ms": 70897,
+    "end_time_ms": 70971,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+  {
+    "type": "click",
+    "x": 1056,
+    "y": 1120,
+    "start_time_ms": 72500,
+    "end_time_ms": 72504,
+    "duration": 0,
+    "orientation": "landscape"
+  },
+    {
+    "type": "click",
+    "x": 1928,
+    "y": 1124,
+    "start_time_ms": 72501,
+    "end_time_ms": 72505,
+    "duration": 0,
+    "orientation": "landscape"
+  }
+]

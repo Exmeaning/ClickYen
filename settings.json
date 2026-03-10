@@ -1,0 +1,38 @@
+{
+  "wireless": {
+    "saved_devices": [],
+    "auto_connect": false,
+    "wireless_priority": false,
+    "default_pair_port": "5037"
+  },
+  "capture": {
+    "method": "printwindow",
+    "show_hdr_warning": true,
+    "debug_log": false
+  },
+  "performance": {
+    "min_check_interval": 0.05,
+    "coord_update_interval": 50
+  },
+  "record": {
+    "record_mouse_move": false,
+    "record_timestamps": true,
+    "default_play_speed": 1.0
+  },
+  "ui": {
+    "auto_refresh_devices": true,
+    "confirm_exit": true,
+    "max_log_lines": 1000
+  },
+  "debug": {
+    "device_events": false,
+    "adb_commands": false,
+    "touch_events": false,
+    "save_raw_events": false
+  },
+  "root": {
+    "enabled": false,
+    "click_method": "su_input",
+    "auto_detect": true
+  }
+}

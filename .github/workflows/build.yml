@@ -1,0 +1,85 @@
+name: Build ClickYen
+
+on:
+  push:
+    branches: [main, master]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nuitka ordered-set zstandard
+
+      - name: Build with Nuitka
+        run: |
+          python -m nuitka ^
+            --standalone ^
+            --onefile ^
+            --output-filename=ClickYen.exe ^
+            --windows-console-mode=force ^
+            --assume-yes-for-downloads ^
+            --include-qt-plugins=all ^
+            --include-qt-plugins=platforms ^
+            --include-qt-plugins=styles ^
+            --include-qt-plugins=iconengines ^
+            --include-package=PyQt6 ^
+            --include-package=PIL ^
+            --include-package=cv2 ^
+            --include-package-data=cv2 ^
+            --include-package=numpy ^
+            --include-package=win32gui ^
+            --include-package=win32api ^
+            --include-package=win32con ^
+            --include-package=win32ui ^
+            --include-package=win32timezone ^
+            --include-package=mss ^
+            --enable-plugin=pyqt6 ^
+            --enable-plugin=numpy ^
+            main.py
+        shell: cmd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClickYen-windows
+          path: ClickYen.exe
+          retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ClickYen-windows
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ClickYen.exe
+          generate_release_notes: true
