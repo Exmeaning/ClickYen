@@ -25,7 +25,7 @@ class Config:
             "last_crop_rect": None,
 
             # Interception 设置
-            "cursor_lock_mode": True,
+            "cursor_lock_mode": False,
             "input_delay_ms": 10,
             "filter_system_keys": True,
             "input_mode": "interception",  # "interception" | "postmessage"

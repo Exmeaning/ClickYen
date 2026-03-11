@@ -29,6 +29,7 @@ class SettingsDialog(QDialog):
 
         tab_widget = QTabWidget()
         tab_widget.addTab(self._create_interception_tab(), "Interception")
+        tab_widget.addTab(self._create_hotkeys_tab(), "快捷键")
         tab_widget.addTab(self._create_recording_tab(), "录制设置")
         tab_widget.addTab(self._create_performance_tab(), "性能设置")
         tab_widget.addTab(self._create_ui_tab(), "界面 / 日志")
@@ -81,6 +82,65 @@ class SettingsDialog(QDialog):
         layout.addWidget(group)
         layout.addStretch()
         return widget
+
+    def _create_hotkeys_tab(self):
+        """创建快捷键设置 Tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+
+        group = QGroupBox("全局快捷键")
+        form = QFormLayout()
+
+        fkeys = [f"F{i}" for i in range(1, 13)]
+
+        self.hotkey_record_combo = QComboBox()
+        self.hotkey_record_combo.addItems(fkeys)
+        self.hotkey_record_combo.setToolTip("开始/停止录制的快捷键")
+        form.addRow("录制 开始/停止:", self.hotkey_record_combo)
+
+        self.hotkey_play_combo = QComboBox()
+        self.hotkey_play_combo.addItems(fkeys)
+        self.hotkey_play_combo.setToolTip("播放/停止播放的快捷键")
+        form.addRow("播放 开始/停止:", self.hotkey_play_combo)
+
+        self.hotkey_monitor_combo = QComboBox()
+        self.hotkey_monitor_combo.addItems(fkeys)
+        self.hotkey_monitor_combo.setToolTip("开始/停止监控的快捷键")
+        form.addRow("监控 开始/停止:", self.hotkey_monitor_combo)
+
+        group.setLayout(form)
+        layout.addWidget(group)
+
+        # 冲突提示
+        self._hotkey_conflict_label = QLabel("")
+        self._hotkey_conflict_label.setStyleSheet("color: #F44336; font-size: 12px; padding: 4px;")
+        self._hotkey_conflict_label.setWordWrap(True)
+        layout.addWidget(self._hotkey_conflict_label)
+
+        # 连接冲突检测
+        for combo in [self.hotkey_record_combo, self.hotkey_play_combo, self.hotkey_monitor_combo]:
+            combo.currentTextChanged.connect(self._check_hotkey_conflict)
+
+        hint = QLabel("提示: 快捷键修改后点击「应用」或「确定」即可生效。\n请避免使用系统常用快捷键（如 F1=帮助, F5=刷新, F11=全屏）。")
+        hint.setStyleSheet("color: #888; font-size: 11px; padding: 8px;")
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+
+        layout.addStretch()
+        return widget
+
+    def _check_hotkey_conflict(self):
+        """检查快捷键是否冲突"""
+        keys = [
+            self.hotkey_record_combo.currentText(),
+            self.hotkey_play_combo.currentText(),
+            self.hotkey_monitor_combo.currentText(),
+        ]
+        if len(keys) != len(set(keys)):
+            self._hotkey_conflict_label.setText("⚠️ 存在重复的快捷键，请修改！")
+            return False
+        self._hotkey_conflict_label.setText("")
+        return True
 
     def _create_recording_tab(self):
         widget = QWidget()
@@ -178,12 +238,17 @@ class SettingsDialog(QDialog):
                 "debug_log": False
             },
             "interception": {
-                "cursor_lock_mode": True,
+                "cursor_lock_mode": False,
                 "input_delay_ms": 10,
                 "filter_system_keys": True
             },
             "recording": {
                 "default_mode": "both"
+            },
+            "hotkeys": {
+                "record": "F9",
+                "play": "F10",
+                "monitor": "F8"
             }
         }
 
@@ -213,9 +278,15 @@ class SettingsDialog(QDialog):
 
         # interception
         icp = s.get("interception", {})
-        self.cursor_lock_check.setChecked(icp.get("cursor_lock_mode", True))
+        self.cursor_lock_check.setChecked(icp.get("cursor_lock_mode", False))
         self.input_delay_spin.setValue(icp.get("input_delay_ms", 10))
         self.filter_syskeys_check.setChecked(icp.get("filter_system_keys", True))
+
+        # hotkeys
+        hk = s.get("hotkeys", {})
+        self.hotkey_record_combo.setCurrentText(hk.get("record", "F9"))
+        self.hotkey_play_combo.setCurrentText(hk.get("play", "F10"))
+        self.hotkey_monitor_combo.setCurrentText(hk.get("monitor", "F8"))
 
         # recording
         rec = s.get("recording", {})
@@ -258,6 +329,11 @@ class SettingsDialog(QDialog):
             },
             "recording": {
                 "default_mode": self.default_mode_combo.currentData()
+            },
+            "hotkeys": {
+                "record": self.hotkey_record_combo.currentText(),
+                "play": self.hotkey_play_combo.currentText(),
+                "monitor": self.hotkey_monitor_combo.currentText()
             }
         }
 
@@ -265,6 +341,9 @@ class SettingsDialog(QDialog):
 
     def apply_settings(self):
         """应用设置"""
+        if not self._check_hotkey_conflict():
+            QMessageBox.warning(self, "警告", "快捷键存在冲突，请修改后再应用")
+            return
         self.settings = self.get_current_settings()
         self.save_settings()
         self.settings_changed.emit(self.settings)
@@ -272,6 +351,9 @@ class SettingsDialog(QDialog):
 
     def accept_settings(self):
         """确定并关闭"""
+        if not self._check_hotkey_conflict():
+            QMessageBox.warning(self, "警告", "快捷键存在冲突，请修改后再应用")
+            return
         self.settings = self.get_current_settings()
         self.save_settings()
         self.settings_changed.emit(self.settings)

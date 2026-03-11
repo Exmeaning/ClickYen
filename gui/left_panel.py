@@ -228,7 +228,7 @@ class LeftPanel(QWidget):
         layout.addWidget(QLabel("光标模式:"))
         self.cursor_free_radio = QRadioButton("自由模式（光标跟随操作）")
         self.cursor_lock_radio = QRadioButton("锁定模式（操作后恢复位置）")
-        self.cursor_lock_radio.setChecked(True)
+        self.cursor_free_radio.setChecked(True)
         self.cursor_free_radio.toggled.connect(
             lambda checked: self.cursor_lock_mode_changed.emit(not checked) if checked else None
         )

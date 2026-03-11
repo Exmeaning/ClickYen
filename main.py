@@ -303,7 +303,7 @@ class ClickYenApp:
             window_mgr = WindowManager()
             controller = InputController(interception_mgr, window_mgr)
 
-            controller.set_cursor_lock_mode(config.get("cursor_lock_mode", True))
+            controller.set_cursor_lock_mode(config.get("cursor_lock_mode", False))
             interception_mgr.set_input_delay(config.get("input_delay_ms", 10))
             controller.set_input_mode(config.get("input_mode", "interception"))
 

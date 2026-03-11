@@ -44,6 +44,7 @@ class InputController(QObject):
         self.long_press_random_range = 0.01    # 长按时间随机
         self.playing = False
         self.stop_playing_flag = False
+        self._hotkey_vk_filter = {0x77, 0x78, 0x79}  # F8, F9, F10 默认过滤
 
     # ==========================================================
     # 输入模式管理
@@ -160,6 +161,11 @@ class InputController(QObject):
             f"位置={position_range * 100}%, 延迟={delay_range * 100}%, "
             f"长按={long_press_range * 100}%"
         )
+
+    def set_hotkey_vk_filter(self, vk_codes):
+        """设置快捷键 VK 码过滤列表（录制时忽略这些按键）"""
+        self._hotkey_vk_filter = set(vk_codes)
+        print(f"[InputController] 快捷键过滤列表更新: {[hex(v) for v in self._hotkey_vk_filter]}")
 
     # ==========================================================
     # 基本输入操作
@@ -730,6 +736,8 @@ class InputController(QObject):
 
     def start_recording(self):
         """开始录制操作"""
+        if self.recording:
+            return True  # 已在录制中，不重复启动
         print(f"[InputController] 准备开始录制... 模式: {self.recording_mode}")
         self.recording = True
         self.recorded_actions = []
@@ -747,8 +755,8 @@ class InputController(QObject):
         if self.recording_mode in ('keyboard', 'both'):
             from core.keyboard_monitor import KeyboardMonitor
             self.keyboard_monitor = KeyboardMonitor()
-            # 过滤录制快捷键 F9 (VK_F9 = 0x78)，避免被录制捕获
-            self.keyboard_monitor.set_filter_vk_codes({0x78})
+            # 过滤快捷键 VK 码，避免被录制捕获
+            self.keyboard_monitor.set_filter_vk_codes(self._hotkey_vk_filter)
             self.keyboard_monitor.action_captured.connect(self.on_action_captured)
             if not self.keyboard_monitor.start_monitoring():
                 if self.recording_mode == 'keyboard':

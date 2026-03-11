@@ -113,11 +113,11 @@ class CenterPanel(QWidget):
         # 播放控制
         play_row = QHBoxLayout()
         
-        self.play_btn = QPushButton("▶ 播放")
+        self.play_btn = QPushButton("▶ 播放 (F10)")
         self.play_btn.setMinimumHeight(28)
         self.play_btn.setEnabled(False)
         
-        self.stop_btn = QPushButton("⏹ 停止")
+        self.stop_btn = QPushButton("⏹ 停止 (F10)")
         self.stop_btn.setMinimumHeight(28)
         self.stop_btn.setEnabled(False)
         
@@ -244,7 +244,7 @@ class CenterPanel(QWidget):
         left_layout.setContentsMargins(0, 0, 5, 0)
         
         # 监控控制按钮
-        self.monitor_btn = QPushButton("▶ 开始监控")
+        self.monitor_btn = QPushButton("▶ 开始监控 (F8)")
         self.monitor_btn.setMinimumHeight(40)
         self.monitor_btn.setCheckable(True)
         self.monitor_btn.setStyleSheet("""
@@ -422,7 +422,7 @@ class CenterPanel(QWidget):
         right_layout.addStretch()
         
         # 监控控制按钮
-        self.monitor_btn = QPushButton("▶ 开始监控")
+        self.monitor_btn = QPushButton("▶ 开始监控 (F8)")
         self.monitor_btn.setMinimumHeight(40)
         self.monitor_btn.setCheckable(True)
         self.monitor_btn.toggled.connect(self.on_monitor_toggled)
@@ -444,16 +444,40 @@ class CenterPanel(QWidget):
         
     def on_record_toggled(self, checked):
         """录制按钮切换"""
+        key = getattr(self, '_record_key', 'F9')
         if checked:
-            self.record_btn.setText("⏸ 停止录制 (F9)")
+            self.record_btn.setText(f"⏸ 停止录制 ({key})")
         else:
-            self.record_btn.setText("⏺ 开始录制 (F9)")
+            self.record_btn.setText(f"⏺ 开始录制 ({key})")
         self.recording_toggled.emit(checked)
         
     def on_monitor_toggled(self, checked):
         """监控按钮切换"""
+        key = getattr(self, '_monitor_key', 'F8')
         if checked:
-            self.monitor_btn.setText("⏹ 停止监控")
+            self.monitor_btn.setText(f"⏹ 停止监控 ({key})")
         else:
-            self.monitor_btn.setText("▶ 开始监控")
+            self.monitor_btn.setText(f"▶ 开始监控 ({key})")
         self.monitor_toggled.emit(checked)
+
+    def update_hotkey_labels(self, record_key, play_key, monitor_key):
+        """动态更新按钮上的快捷键提示文本"""
+        self._record_key = record_key
+        self._play_key = play_key
+        self._monitor_key = monitor_key
+
+        # 播放/停止按钮
+        self.play_btn.setText(f"▶ 播放 ({play_key})")
+        self.stop_btn.setText(f"⏹ 停止 ({play_key})")
+
+        # 录制按钮（根据当前状态）
+        if self.record_btn.isChecked():
+            self.record_btn.setText(f"⏸ 停止录制 ({record_key})")
+        else:
+            self.record_btn.setText(f"⏺ 开始录制 ({record_key})")
+
+        # 监控按钮（根据当前状态）
+        if self.monitor_btn.isChecked():
+            self.monitor_btn.setText(f"⏹ 停止监控 ({monitor_key})")
+        else:
+            self.monitor_btn.setText(f"▶ 开始监控 ({monitor_key})")

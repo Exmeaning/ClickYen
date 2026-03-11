@@ -928,6 +928,32 @@ class ActionEditDialog(QDialog):
 
         layout.addWidget(self.param_stack)
 
+        # 实时坐标显示（仅鼠标/滑动动作时可见）
+        self.coord_label = QLabel("🎯 窗口坐标: (-, -)")
+        self.coord_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.coord_label.setStyleSheet("""
+            QLabel {
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: 16px;
+                font-weight: bold;
+                color: #424242;
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 8px;
+                margin: 4px 0;
+            }
+        """)
+        layout.addWidget(self.coord_label)
+
+        # 坐标追踪定时器
+        self._coord_timer = QTimer(self)
+        self._coord_timer.timeout.connect(self._update_coord_display)
+        self._coord_timer.start(50)
+
+        # 根据初始动作类型决定是否显示
+        self._update_coord_visibility(self.type_combo.currentIndex())
+
         # 按钮
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -1256,6 +1282,52 @@ class ActionEditDialog(QDialog):
     def on_type_changed(self, index):
         """动作类型改变"""
         self.param_stack.setCurrentIndex(index)
+        self._update_coord_visibility(index)
+
+    def _update_coord_visibility(self, index):
+        """根据动作类型显示/隐藏坐标追踪"""
+        # index 0=点击, 1=滑动 → 显示坐标
+        visible = index in (0, 1)
+        self.coord_label.setVisible(visible)
+
+    def _update_coord_display(self):
+        """定时更新鼠标对应的窗口坐标"""
+        if not self.coord_label.isVisible():
+            return
+        try:
+            import win32gui
+            wm = self.controller.window_mgr
+            cursor_pos = win32gui.GetCursorPos()
+            if wm.is_point_in_target(*cursor_pos):
+                wx, wy = wm.screen_to_window(*cursor_pos)
+                self.coord_label.setText(f"🎯 窗口坐标: ({wx}, {wy})")
+                self.coord_label.setStyleSheet("""
+                    QLabel {
+                        font-family: 'Consolas', 'Monaco', monospace;
+                        font-size: 16px; font-weight: bold;
+                        color: #1b5e20; background-color: #e8f5e9;
+                        border: 1px solid #a5d6a7; border-radius: 6px;
+                        padding: 8px; margin: 4px 0;
+                    }
+                """)
+            else:
+                self.coord_label.setText("🎯 窗口坐标: (-, -)  请将鼠标移到目标窗口")
+                self.coord_label.setStyleSheet("""
+                    QLabel {
+                        font-family: 'Consolas', 'Monaco', monospace;
+                        font-size: 16px; font-weight: bold;
+                        color: #424242; background-color: #f0f0f0;
+                        border: 1px solid #ccc; border-radius: 6px;
+                        padding: 8px; margin: 4px 0;
+                    }
+                """)
+        except Exception:
+            self.coord_label.setText("🎯 窗口坐标: (-, -)")
+
+    def done(self, result):
+        """对话框关闭时停止定时器"""
+        self._coord_timer.stop()
+        super().done(result)
 
     def load_action(self):
         """加载动作"""

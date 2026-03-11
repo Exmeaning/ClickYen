@@ -18,15 +18,15 @@ from gui.right_panel import RightPanel
 
 
 class HotkeyFilter(QAbstractNativeEventFilter):
-    """原生事件过滤器 - 安全处理 WM_HOTKEY"""
+    """原生事件过滤器 - 安全处理多个 WM_HOTKEY"""
 
-    def __init__(self, callback):
+    def __init__(self):
         super().__init__()
-        self._callback = callback
-        self._hotkey_id = -1
+        self._callbacks = {}  # {hotkey_id: callback}
 
-    def set_hotkey_id(self, hid):
-        self._hotkey_id = hid
+    def register_hotkey(self, hotkey_id, callback):
+        """注册热键回调"""
+        self._callbacks[hotkey_id] = callback
 
     def nativeEventFilter(self, eventType, message):
         WM_HOTKEY = 0x0312
@@ -44,12 +44,19 @@ class HotkeyFilter(QAbstractNativeEventFilter):
                         wparam = ctypes.c_ulonglong.from_address(
                             addr + wparam_offset
                         ).value
-                        if wparam == self._hotkey_id:
-                            QTimer.singleShot(0, self._callback)
+                        callback = self._callbacks.get(wparam)
+                        if callback:
+                            QTimer.singleShot(0, callback)
                             return True, 0
             except Exception:
                 pass
         return False, 0
+
+
+# F键名 → VK Code 映射
+FKEY_TO_VK = {f"F{i}": 0x70 + i - 1 for i in range(1, 13)}
+# VK Code → F键名 反向映射
+VK_TO_FKEY = {v: k for k, v in FKEY_TO_VK.items()}
 
 
 class MainWindow(QMainWindow):
@@ -344,27 +351,98 @@ class MainWindow(QMainWindow):
 
     def setup_shortcuts(self):
         """设置全局热键（延迟注册，避免 winId() 在初始化阶段阻塞）"""
-        # 安装原生事件过滤器（替代 nativeEvent 重写，避免 PyQt6 access violation）
-        self._hotkey_filter = HotkeyFilter(lambda: self.toggle_recording())
+        self._hotkey_filter = HotkeyFilter()
         QApplication.instance().installNativeEventFilter(self._hotkey_filter)
+        self._hotkey_ids = []
+        self._current_hotkey_vks = {}  # {"record": vk, "play": vk, "monitor": vk}
         QTimer.singleShot(200, self._register_global_hotkeys)
 
-    def _register_global_hotkeys(self):
-        """实际注册全局热键"""
-        VK_F9 = 0x78
-        HOTKEY_ID_F9 = 1
-        self._hotkey_id_f9 = HOTKEY_ID_F9
-        self._hotkey_filter.set_hotkey_id(HOTKEY_ID_F9)
+    def _load_hotkey_settings(self):
+        """从 settings.json 读取快捷键配置"""
+        defaults = {"record": "F9", "play": "F10", "monitor": "F8"}
+        try:
+            import os
+            if os.path.exists("settings.json"):
+                with open("settings.json", 'r', encoding='utf-8') as f:
+                    settings = json.load(f)
+                hk = settings.get("hotkeys", {})
+                return {
+                    "record": hk.get("record", defaults["record"]),
+                    "play": hk.get("play", defaults["play"]),
+                    "monitor": hk.get("monitor", defaults["monitor"]),
+                }
+        except Exception:
+            pass
+        return defaults
 
-        result = ctypes.windll.user32.RegisterHotKey(
-            int(self.winId()), HOTKEY_ID_F9, 0x4000, VK_F9
-        )
-        if result:
-            print("[MainWindow] 全局热键 F9 注册成功")
+    def _register_global_hotkeys(self):
+        """注册全局热键（从设置读取键位）"""
+        hk = self._load_hotkey_settings()
+        self._apply_hotkeys(hk)
+
+    def _apply_hotkeys(self, hk_config):
+        """应用快捷键配置: 注销旧热键 → 注册新热键 → 更新 UI
+
+        Args:
+            hk_config: {"record": "F9", "play": "F10", "monitor": "F8"}
+        """
+        hwnd = int(self.winId())
+
+        # 注销旧热键
+        for hid in self._hotkey_ids:
+            ctypes.windll.user32.UnregisterHotKey(hwnd, hid)
+        self._hotkey_ids.clear()
+        self._hotkey_filter._callbacks.clear()
+
+        # 解析键名 → VK Code
+        record_key = hk_config.get("record", "F9")
+        play_key = hk_config.get("play", "F10")
+        monitor_key = hk_config.get("monitor", "F8")
+
+        record_vk = FKEY_TO_VK.get(record_key, 0x78)
+        play_vk = FKEY_TO_VK.get(play_key, 0x79)
+        monitor_vk = FKEY_TO_VK.get(monitor_key, 0x77)
+
+        self._current_hotkey_vks = {
+            "record": record_vk, "play": play_vk, "monitor": monitor_vk
+        }
+
+        HOTKEY_ID_RECORD = 1
+        HOTKEY_ID_PLAY = 2
+        HOTKEY_ID_MONITOR = 3
+
+        # 注册回调
+        self._hotkey_filter.register_hotkey(HOTKEY_ID_RECORD, lambda: self.toggle_recording())
+        self._hotkey_filter.register_hotkey(HOTKEY_ID_PLAY, lambda: self.toggle_play())
+        self._hotkey_filter.register_hotkey(HOTKEY_ID_MONITOR, lambda: self.toggle_monitoring_hotkey())
+
+        hotkeys = [
+            (HOTKEY_ID_RECORD, record_vk, record_key),
+            (HOTKEY_ID_PLAY, play_vk, play_key),
+            (HOTKEY_ID_MONITOR, monitor_vk, monitor_key),
+        ]
+
+        for hid, vk, name in hotkeys:
+            result = ctypes.windll.user32.RegisterHotKey(hwnd, hid, 0x4000, vk)
+            if result:
+                print(f"[MainWindow] 全局热键 {name} 注册成功")
+                self._hotkey_ids.append(hid)
+            else:
+                print(f"[MainWindow] 全局热键 {name} 注册失败")
+
+        # 更新按钮文本
+        self.center_panel.update_hotkey_labels(record_key, play_key, monitor_key)
+
+        # 更新录制按钮文本
+        if self.is_recording:
+            self.record_btn.setText(f"停止录制 ({record_key})")
         else:
-            print("[MainWindow] 全局热键 F9 注册失败，回退到窗口快捷键")
-            self._f9_shortcut = QShortcut(QKeySequence(Qt.Key.Key_F9), self)
-            self._f9_shortcut.activated.connect(lambda: self.toggle_recording())
+            self.record_btn.setText(f"开始录制 ({record_key})")
+
+        # 更新 KeyboardMonitor 过滤列表
+        self.controller.set_hotkey_vk_filter(
+            {record_vk, play_vk, monitor_vk}
+        )
 
     def toggle_recording(self, checked=None):
         """切换录制状态"""
@@ -380,20 +458,28 @@ class MainWindow(QMainWindow):
 
             if self.controller.start_recording():
                 self.is_recording = True
+                self.record_btn.blockSignals(True)
                 self.record_btn.setChecked(True)
-                self.record_btn.setText("停止录制 (F9)")
+                self.record_btn.blockSignals(False)
+                record_key = VK_TO_FKEY.get(self._current_hotkey_vks.get("record", 0x78), "F9")
+                self.record_btn.setText(f"停止录制 ({record_key})")
                 self.record_mode_combo.setEnabled(False)
                 self.log(f"开始{mode_text}...")
                 self.statusBar().showMessage(f"🔴 正在录制 ({mode_text})...")
                 self.action_list.clear()
             else:
                 QMessageBox.warning(self, "警告", "无法启动录制，请检查目标窗口是否已选择")
+                self.record_btn.blockSignals(True)
                 self.record_btn.setChecked(False)
+                self.record_btn.blockSignals(False)
         else:
             actions = self.controller.stop_recording()
             self.is_recording = False
+            self.record_btn.blockSignals(True)
             self.record_btn.setChecked(False)
-            self.record_btn.setText("开始录制 (F9)")
+            self.record_btn.blockSignals(False)
+            record_key = VK_TO_FKEY.get(self._current_hotkey_vks.get("record", 0x78), "F9")
+            self.record_btn.setText(f"开始录制 ({record_key})")
             self.record_mode_combo.setEnabled(True)
             self.log(f"录制完成，共 {len(actions)} 个操作")
             self.play_btn.setEnabled(len(actions) > 0)
@@ -467,6 +553,13 @@ class MainWindow(QMainWindow):
 
     # ── 播放 ──────────────────────────────────────────────
 
+    def toggle_play(self):
+        """快捷键切换播放/停止"""
+        if self.controller.playing:
+            self.stop_playing()
+        else:
+            self.play_recording()
+
     def play_recording(self):
         """播放录制"""
         if not self.controller.recorded_actions:
@@ -539,6 +632,11 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "错误", f"加载失败: {str(e)}")
 
     # ── 监控 ──────────────────────────────────────────────
+
+    def toggle_monitoring_hotkey(self):
+        """快捷键切换监控状态"""
+        current = self.center_panel.monitor_btn.isChecked()
+        self.center_panel.monitor_btn.setChecked(not current)
 
     def add_monitor_task(self):
         """添加监控任务"""
@@ -672,6 +770,11 @@ class MainWindow(QMainWindow):
         doc = self.log_text.document()
         doc.setMaximumBlockCount(max_lines)
 
+        # 快捷键变更
+        hk = settings.get("hotkeys", {})
+        if hk:
+            self._apply_hotkeys(hk)
+
         self.log("设置已更新")
 
     def load_and_apply_settings(self):
@@ -796,9 +899,10 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         """关闭事件"""
-        # 注销全局热键
-        if hasattr(self, '_hotkey_id_f9'):
-            ctypes.windll.user32.UnregisterHotKey(int(self.winId()), self._hotkey_id_f9)
+        # 注销所有全局热键
+        if hasattr(self, '_hotkey_ids'):
+            for hid in self._hotkey_ids:
+                ctypes.windll.user32.UnregisterHotKey(int(self.winId()), hid)
         # 移除原生事件过滤器
         if hasattr(self, '_hotkey_filter'):
             QApplication.instance().removeNativeEventFilter(self._hotkey_filter)
